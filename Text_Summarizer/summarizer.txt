@@ -1,0 +1,50 @@
+Generating accurate summaries for long pieces of text
+PageRank algorithm to find important sentences
+
+PyPDF2 is a library used for reading the PDF files
+docx2txt is the library used for reading Word documents
+networkx library helps in working with graphs and later performing the PageRank algorithm
+PunktSentenceTokenizer is used to tokenize documents into sentences
+TfidfTransformer
+CountVectorizer convert document into document-term matrix
+
+PyPDF2.PdfFileReader is passed the file descriptor and we use getPage to obtain a page and extractText() to obtain the text
+Read text files normally
+
+Tokenize the document (document is the corpus and sentences are documents)
+Then we convert document into document-term matrix with values as the frequency of term in the document (tf without log)
+We then convert d-t matrix into tf-idf matrix
+TF(Term Frequency): the no. of times a term(a word here) appears in the current document(single sentence here)
+IDF(Inverse Document Frequency): the no. of times a term(a word here) appears in the entire corpus
+Size of matrix remains same (#documents * #terms)
+
+We find similarity between 2 documents by taking dot product of the tf-idf matrix with its transpose
+Resulting size is (#documents * #documents) = res_matrix
+Now we draw a graph using the res_matrix, where each document is a node and edge weight represent similarity
+
+Now the PageRank algorithm assigns score to each document
+We select threshold using (sum_of_all_scores / number of documents) + bias
+Any sentence with score higher than threshold is selected
+The ordering of the sentences is not changed to maintain context information
+
+--------------------------------------------------------------------------------------------------------
+Algorithms:-
+	CountVectorizer:
+		We can do this by creating a set of unique words (in the corpus) and count their occurences in each document
+	Tf-Idf:
+		for each element in cv_matrix:
+			log(1 + tf)*log(N / num_of_rows not zero for that term)
+		can be parallized as follows:
+			first calculate idf = log(row_count matrix)
+			then do log(1+tf)*idf (broadcasted)
+	PageRank:
+		PageRank of page A = summation [for all vertices v PR(v) / Links(v) ]
+		where,
+			PR(v) = PageRank of v
+			Links(v) = number of links outgoing from v
+		Initially Page of all Nodes is initialized to (1 / number of nodes)
+		for each iteration:
+			for each node:
+				new_score = (1-alpha) + alpha * old_score * edge_weight
+					where alpha is the damping factor
+		(1-alpha) term is added so that even pages with no incoming links have some pagerank
